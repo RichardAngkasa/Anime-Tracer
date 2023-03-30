@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useState } from "react";
 import gif from "/public/assets/loading.gif";
+import logo from "/public/assets/animetracelogo.png";
 
 interface Content {
   anilist: number;
@@ -89,11 +90,11 @@ export default function HomeBase() {
 
   return (
     <div className="max-w-[67rem] mx-auto px-4">
-      <div className="grid grid-cols-3 gap-4 h-screen overflow-hidden">
+      <div className="grid grid-cols-3 gap-4 overflow-hidden">
         <div className="col-span-3  gap-4 mt-4">
-          <div className="sticky top-4 space-y-4 h-full">
+          <div className="sticky top-4 space-y-4 ">
             <div className="grid grid-cols-7  p-4 w-full border-4 border-stroke rounded-lg gap-4 h-fit">
-              <img src="logo" alt="" />
+              <img src={logo.src} alt="" />
               <form
                 onSubmit={handleUrlSubmit}
                 className="col-span-3 flex gap-3 items-center"
