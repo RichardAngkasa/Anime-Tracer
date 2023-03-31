@@ -143,6 +143,11 @@ export default function HomeBase() {
           </div>
         </div>
         <div className="col-span-3 md:col-span-1 p-4 mb-4 w-full border-4 border-stroke rounded-lg space-y-2 h-fit md:h-1/2 gap-2 md:overflow-scroll overscroll-none">
+          {loading && oneData == undefined ? (
+            <div className="flex justify-center items-center">
+              <img src={gif.src} alt="loading" className="w-20 h-20" />
+            </div>
+          ) : null}
           {data !== undefined
             ? data.map((a, i) => {
                 const test = (duration: number) => {
