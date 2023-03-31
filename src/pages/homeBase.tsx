@@ -20,7 +20,7 @@ export default function HomeBase() {
   const [data, setData] = useState<Content[]>([]);
   const [oneData, setOneData] = useState<Content>();
   const [loading, setLoading] = useState<boolean>(false);
-  console.log(loading);
+  const [change, setChange] = useState<boolean>(false);
 
   const handleInputUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setUrl(e.target.value);
@@ -51,7 +51,7 @@ export default function HomeBase() {
     event.preventDefault();
     setLoading(true);
     if (!imageFile) {
-      // Handle error: no image file selected
+      alert("select your image");
       return;
     }
 
@@ -80,13 +80,12 @@ export default function HomeBase() {
 
   const handleContentChange = (load: Content) => {
     setOneData(load);
+    change ? setChange(false) : setChange(true);
   };
 
   useEffect(() => {
     setLoading(false);
   }, [data]);
-
-  console.log(oneData?.anilist);
 
   return (
     <div className="max-w-[67rem] mx-auto px-4">
@@ -94,17 +93,27 @@ export default function HomeBase() {
         <div className="col-span-3  gap-4 mt-4">
           <div className="sticky top-4 space-y-4 ">
             <div className="grid grid-cols-7  p-4 w-full border-4 border-stroke rounded-lg gap-4 h-fit">
-              <img src={logo.src} alt="" />
+              <div
+                className=" col-span-2  md:col-span-1 flex items-center cursor-pointer"
+                onClick={() => {
+                  window.location.reload();
+                }}
+              >
+                <img src={logo.src} alt="" />
+              </div>{" "}
               <form
                 onSubmit={handleUrlSubmit}
-                className="col-span-3 flex gap-3 items-center"
+                className="col-span-5 md:col-span-3 flex gap-3 items-center"
               >
                 <div className="flex items-center justify-between w-full">
-                  <h1 className="font-bold text-stroke text-lg w-16">LINK</h1>
+                  <h1 className="hidden md:block font-bold text-stroke text-lg w-16">
+                    LINK
+                  </h1>
                   <input
                     type="text"
                     onChange={handleInputUrlChange}
                     value={url}
+                    placeholder="Link"
                     className="bg-secondary rounded-sm h-10 font-bold px-4  w-full outline-none text-stroke"
                   />
                 </div>
@@ -114,17 +123,18 @@ export default function HomeBase() {
               </form>
               <form
                 onSubmit={handleImageSubmit}
-                className="col-span-3 flex gap-3 items-center"
+                className="col-span-7 md:col-span-3 flex gap-3 items-center"
               >
                 <div className="flex items-center justify-between w-full">
-                  <h1 className="font-bold text-stroke text-lg w-16">FILE</h1>
+                  <h1 className="hidden md:block font-bold text-stroke text-lg w-16">
+                    FILE
+                  </h1>
                   <input
                     type="file"
                     onChange={handleImageChange}
                     className="bg-secondary rounded-sm h-10 text-stroke px-4 w-full flex items-center"
                   />
                 </div>
-
                 <button className="font-bold text-buttoneText text-base rounded-sm bg-highlight hover:bg-highlight/90 transition-all duration-200 px-5 h-10 flex items-center">
                   submit
                 </button>
@@ -132,49 +142,110 @@ export default function HomeBase() {
             </div>
           </div>
         </div>
-        <div className="col-span-1 p-4 w-full border-4 border-stroke rounded-lg space-y-2 h-1/2 gap-2 overflow-scroll ">
+        <div className="col-span-3 md:col-span-1 p-4 mb-4 w-full border-4 border-stroke rounded-lg space-y-2 h-fit md:h-1/2 gap-2 md:overflow-scroll overscroll-none">
           {data !== undefined
-            ? data.map((a, i) => (
-                <div
-                  key={i}
-                  className="flex gap-4 bg-secondary rounded-sm"
-                  onClick={() => {
-                    handleContentChange(a);
-                  }}
-                >
-                  <img
-                    src={a.image}
-                    alt={a.filename}
-                    className="rounded-sm w-2/4"
-                  />
-                  <h1 className="font-normal text-stroke">{a.filename}</h1>
-                </div>
-              ))
+            ? data.map((a, i) => {
+                const test = (duration: number) => {
+                  var hours = Math.floor(duration / 60);
+                  var minutes = Math.floor(duration % 60);
+                  var seconds = Math.floor(
+                    (duration - Math.floor(duration)) * 60
+                  );
+                  var formattedDuration =
+                    ("0" + hours).slice(-2) +
+                    ":" +
+                    ("0" + minutes).slice(-2) +
+                    ":" +
+                    ("0" + seconds).slice(-2);
+                  return formattedDuration;
+                };
+                const startTime = test(a.from);
+                const endTime = test(a.to);
+                return (
+                  <>
+                    {" "}
+                    <div
+                      key={i}
+                      className="flex gap-4 rounded-sm flex-col"
+                      onClick={() => {
+                        handleContentChange(a);
+                      }}
+                    >
+                      <div className="relative flex justify-end">
+                        {" "}
+                        <div className="absolute ">
+                          {" "}
+                          <h1 className="font-normal text-xl text-stroke bg-secondary">
+                            Match {Math.round(a.similarity * 100 * 100) / 100}%
+                          </h1>
+                        </div>
+                        {change ? (
+                          oneData?.anilist === a.anilist ? (
+                            <video
+                              key={oneData?.anilist}
+                              autoPlay
+                              muted
+                              loop
+                              className="w-full"
+                            >
+                              <source src={oneData?.video} type="video/mp4" />
+                            </video>
+                          ) : (
+                            <img
+                              src={a.image}
+                              alt={a.filename}
+                              className="rounded-sm w-full"
+                            />
+                          )
+                        ) : (
+                          <img
+                            src={a.image}
+                            alt={a.filename}
+                            className="rounded-sm w-full"
+                          />
+                        )}
+                      </div>
+                      <div>
+                        {" "}
+                        <h1 className="font-bold text-stroke">{a.filename}</h1>
+                        <div className="font-normal text-stroke flex gap-2">
+                          <h1>Episode {a.episode}</h1>
+                          <span> | </span>
+                          <h1>
+                            {startTime} - {endTime}
+                          </h1>
+                        </div>
+                      </div>
+                      <div className="w-full h-1 bg-secondary"></div>
+                    </div>
+                  </>
+                );
+              })
             : null}
         </div>
-        <div className="col-span-2 gap-4 p-4 border-4 space-y-4 h-2/3 overflow-scroll border-stroke  rounded-lg ">
-          {/* <div className="bg-secondary w-full h-96"> */}
+        <div className="col-span-2 p-4 border-4 h-fit border-stroke hidden md:block rounded-lg ">
           {loading && oneData == undefined ? (
-            <div className="flex h-2/3 justify-center items-center">
+            <div className="flex justify-center items-center">
               <img src={gif.src} alt="loading" className="w-32 h-32" />
             </div>
           ) : null}
-          <div className="text-base text-black">{oneData?.filename}</div>
 
           {oneData !== undefined ? (
             <div>
               <video
-                key={oneData.anilist}
+                key={oneData?.anilist}
                 autoPlay
                 muted
                 loop
                 className="w-full"
               >
-                <source src={oneData.video} type="video/mp4" />
+                <source src={oneData?.video} type="video/mp4" />
               </video>
+              <div className="text-lg font-bold text-black">
+                {oneData?.filename}
+              </div>
             </div>
           ) : null}
-          {/* </div> */}
         </div>
       </div>
     </div>
